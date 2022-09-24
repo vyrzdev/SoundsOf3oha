@@ -36,7 +36,7 @@ jobs:
           pip install flask
           pip install spotipy
           
-          python main.py
+          python run.py
           git add -A
           git diff-index --quiet HEAD || git commit -m 'Updated URL Log'
           git push
