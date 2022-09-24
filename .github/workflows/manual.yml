@@ -1,0 +1,40 @@
+name: Crawl Channel
+on: workflow_dispatch
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflows contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Runs a set of commands using the runners shell
+      - uses: actions/checkout@v2
+        with:
+          ref: master
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+
+      - name: Run a multi-line script
+        run: |
+          git config --global user.name "MrMusicBot"
+          export DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}
+          export DISCORD_GUILD_ID=${{ secrets.DISCORD_GUILD_ID }}
+          export DISCORD_CHANNEL_ID=${{ secrets.DISCORD_CHANNEL_ID }}
+          export SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID }}
+          export SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          export TOKEN_INFO_ENCRYPTION_KEY=${{ secrets.TOKEN_INFO_ENCRYPTION_KEY }}
+          
+          pip install discord
+          pip install cryptography
+          pip install flask
+          pip install spotipy
+          
+          python main.py
+          git add -A
+          git diff-index --quiet HEAD || git commit -m 'Updated URL Log'
+          git push
