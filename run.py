@@ -81,7 +81,7 @@ async def do():
     regex = "(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])"
 
     new_urls = list()
-    message_fetch_limit = None
+    message_fetch_limit = 100
     print(f"Fetching discord messages, limit: {message_fetch_limit}")
     async for message in channel.history(limit=message_fetch_limit):
         if message.content.__contains__("https://open.spotify.com/track"):
@@ -91,21 +91,32 @@ async def do():
                     new_urls.append(url)
                     print(f"New URL found, {url}")
     if len(new_urls) > 0:
+        print("Checking URL Validity.")
+        valid_urls = list()
+        for url in new_urls:
+            try:
+                spotify_client.track(url)
+                valid_urls.append(url)
+                print("Url valid: "+url)
+            except:
+                print("Invalid URL found, ignoring. : "+url)
+
         print("New URLs found, pushing to log+spotify")
         with open("urls.log", "a") as url_log:
-            url_log.writelines([f"{url}\n" for url in new_urls])
+            url_log.writelines([f"{url}\n" for url in valid_urls])
 
         print("Log written.")
+
         spotify_client.playlist_add_items(
             spotify_playlist_url,
-            new_urls,
+            valid_urls,
             position=0
         )
         print("Playlist Updated")
         embed = discord.Embed(
             title="Added songs to playlist!",
             url=spotify_playlist_url,
-            description="\n".join(new_urls)[:4095]
+            description="\n".join(valid_urls)[:4095]
         )
         await channel.send(embed=embed)
         print("Message sent. Exiting!")
