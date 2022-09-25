@@ -90,17 +90,18 @@ async def do():
                 if url not in existing_urls:
                     new_urls.append(url)
                     print(f"New URL found, {url}")
-    if len(new_urls) > 0:
-        print("Checking URL Validity.")
-        valid_urls = list()
-        for url in new_urls:
-            try:
-                spotify_client.track(url)
-                valid_urls.append(url)
-                print("Url valid: "+url)
-            except:
-                print("Invalid URL found, ignoring. : "+url)
 
+    print("Checking URL Validity.")
+    valid_urls = list()
+    for url in new_urls:
+        try:
+            spotify_client.track(url)
+            valid_urls.append(url)
+            print("Url valid: " + url)
+        except:
+            print("Invalid URL found, ignoring. : " + url)
+
+    if len(valid_urls) > 0:
         print("New URLs found, pushing to log+spotify")
         with open("urls.log", "a") as url_log:
             url_log.writelines([f"{url}\n" for url in valid_urls])
