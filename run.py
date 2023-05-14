@@ -87,7 +87,7 @@ async def do():
         if message.content.__contains__("https://open.spotify.com/track"):
             for url in re.findall(regex, message.content):
                 url, sep, end = f"{url[0]}://{url[1]}{url[2]}".partition("?si=")
-                if url not in existing_urls:
+                if (url not in existing_urls) and (url not in new_urls):
                     new_urls.append(url)
                     print(f"New URL found, {url}")
 
